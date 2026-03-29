@@ -1,15 +1,13 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { weddingData } from "../data/wedding";
 import CoupleNames from "../components/CoupleNames";
 
-const CoverPage: React.FC = () => {
-  const navigate = useNavigate();
+interface CoverPageProps {
+  onOpen: () => void;
+}
 
-  const handleOpen = () => {
-    navigate("/invitation", { state: { autoPlay: true } });
-  };
+const CoverPage: React.FC<CoverPageProps> = ({ onOpen }) => {
 
   return (
     <div
@@ -85,7 +83,7 @@ const CoverPage: React.FC = () => {
           </p>
 
           <motion.button
-            onClick={handleOpen}
+            onClick={onOpen}
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
             className="btn-gold rounded-none cursor-pointer font-sans"

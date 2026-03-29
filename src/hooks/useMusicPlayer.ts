@@ -1,45 +1,51 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 export const useMusicPlayer = (src: string) => {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audio] = useState(() => new Audio(src));
+  
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const audio = new Audio(src);
+    audio.src = src; // Always ensure src is set (fixes StrictMode src wipe)
     audio.loop = true;
     audio.volume = 0.4;
-    audioRef.current = audio;
 
-    audio.addEventListener('canplaythrough', () => setIsLoaded(true));
+    const handleCanPlay = () => setIsLoaded(true);
+    const handleEnded = () => setIsPlaying(false);
+
+    audio.addEventListener('canplaythrough', handleCanPlay);
+    audio.addEventListener('ended', handleEnded);
 
     return () => {
+      audio.removeEventListener('canplaythrough', handleCanPlay);
+      audio.removeEventListener('ended', handleEnded);
       audio.pause();
-      audio.src = '';
+      // Do not set audio.src = '' here because React Strict Mode will remount immediately
     };
-  }, [src]);
+  }, [audio, src]);
 
-  const play = () => {
-    if (audioRef.current) {
-      audioRef.current.play().catch(() => {});
-      setIsPlaying(true);
-    }
-  };
+  const play = useCallback(() => {
+    audio.play()
+      .then(() => setIsPlaying(true))
+      .catch((err) => {
+        console.error("Autoplay prevented:", err);
+        setIsPlaying(false);
+      });
+  }, [audio]);
 
-  const pause = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-  };
+  const pause = useCallback(() => {
+    audio.pause();
+    setIsPlaying(false);
+  }, [audio]);
 
-  const toggle = () => {
+  const toggle = useCallback(() => {
     if (isPlaying) {
       pause();
     } else {
       play();
     }
-  };
+  }, [isPlaying, pause, play]);
 
   return { isPlaying, isLoaded, toggle, play, pause };
 };

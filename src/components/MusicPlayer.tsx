@@ -1,26 +1,13 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { Play, Pause } from "lucide-react";
-import { useMusicPlayer } from "../hooks/useMusicPlayer";
-import { weddingData } from "../data/wedding";
 
 interface MusicPlayerProps {
-  autoPlay?: boolean;
+  isPlaying: boolean;
+  onToggle: () => void;
 }
 
-const MusicPlayer: React.FC<MusicPlayerProps> = ({ autoPlay = false }) => {
-  const { isPlaying, isLoaded, toggle, play } = useMusicPlayer(
-    weddingData.musicUrl,
-  );
-  const hasAutoPlayed = useRef(false);
-
-  useEffect(() => {
-    if (autoPlay && isLoaded && !isPlaying && !hasAutoPlayed.current) {
-      play();
-      hasAutoPlayed.current = true;
-    }
-  }, [autoPlay, isLoaded, isPlaying, play]);
-
+const MusicPlayer: React.FC<MusicPlayerProps> = ({ isPlaying, onToggle }) => {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0 }}
@@ -29,8 +16,8 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ autoPlay = false }) => {
       className="fixed bottom-6 right-6 z-50"
     >
       <button
-        onClick={toggle}
-        className="relative w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300"
+        onClick={onToggle}
+        className="relative w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer"
         style={{
           background: "linear-gradient(135deg, #D4AF37 0%, #F5E070 100%)",
           boxShadow: isPlaying
@@ -66,13 +53,6 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ autoPlay = false }) => {
           )}
         </span>
       </button>
-
-      {/* Label */}
-      <motion.div
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: isPlaying ? 1 : 0, x: isPlaying ? 0 : 20 }}
-        className="absolute right-14 top-1/2 -translate-y-1/2 whitespace-nowrap"
-      ></motion.div>
     </motion.div>
   );
 };

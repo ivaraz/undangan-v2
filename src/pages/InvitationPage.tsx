@@ -1,5 +1,4 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
 import CountdownSection from '../components/CountdownSection';
@@ -14,10 +13,12 @@ import Footer from '../components/Footer';
 import MusicPlayer from '../components/MusicPlayer';
 import { motion } from 'framer-motion';
 
-const InvitationPage: React.FC = () => {
-  const location = useLocation();
-  const autoPlayMode = location.state?.autoPlay || false;
+interface InvitationPageProps {
+  isPlaying: boolean;
+  toggleMusic: () => void;
+}
 
+const InvitationPage: React.FC<InvitationPageProps> = ({ isPlaying, toggleMusic }) => {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -27,7 +28,7 @@ const InvitationPage: React.FC = () => {
       style={{ background: '#0A0A0A' }}
     >
       <Navbar isVisible={true} />
-      <MusicPlayer autoPlay={autoPlayMode} />
+      <MusicPlayer isPlaying={isPlaying} onToggle={toggleMusic} />
 
       <main>
         <HeroSection />
